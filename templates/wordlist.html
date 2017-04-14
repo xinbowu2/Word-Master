@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Word Master</title>
+ 
+    <link href="../static/signup.css" rel="stylesheet">
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/jumbotron-narrow.css" rel="stylesheet">
+    <script src="../static/jquery-1.12.3.js"></script>
+
+    <script>
+        $(function() {
+            $.ajax({
+                url: '/getWord',
+                type: 'GET',
+                success: function(res) {
+                    var div = $('<div>')
+                        .attr('class', 'list-group')
+                        .append($('<a>')
+                            .attr('class', 'list-group-item active')
+                            .append($('<h4>')
+                                .attr('class', 'list-group-item-heading')));
+
+                        var wordObj = JSON.parse(res);
+
+                        var word = '';
+
+                        $.each(wordObj, function(index, value) {
+                            word = $(div).clone();
+                            $(word).find('h4').text(value.content);
+                            $('.jumbotron').append(word);
+                        });
+
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation"><a href="/userHome">Home</a></li>
+                    <li role="presentation" class="active"><a href="/wordlist">Word List</a></li>
+                    <li role="presentation"><a href="/showQuiz">Quiz!</a></li>
+                    <li role="presentation"><a href="/logout">Log Out</a></li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">Word Master</h3>
+        </div>
+
+        <div class="jumbotron">
+            <h3>{{ username }}'s List:</h3>
+        </div>
+
+
+        <footer class="footer">
+            <p>&copy; Team0x2d 2016</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

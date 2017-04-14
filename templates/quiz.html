@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+	<title>Word Master</title>
+ 
+	<link href="../static/quiz.css" rel="stylesheet">
+	<link href="../static/bootstrap.min.css" rel="stylesheet">
+	<link href="../static/jumbotron-narrow.css" rel="stylesheet">
+	<link href="../static/signup.css" rel="stylesheet">
+	<script src="../static/jquery-1.12.3.js"></script>
+	<script>
+	  $(function(){
+		var loading = $('#loadbar').hide();
+		$(document)
+		.ajaxStart(function () {
+		  loading.show();
+		}).ajaxStop(function () {
+		loading.hide();
+		});
+
+		var quizes = {{ quizes|tojson }};
+		var n = 0;
+		var max = quizes.length;
+		var answer = quizes[0]['answer'];
+		var returnedAnswers = [];
+
+		$("#question").html("<span class='label label-warning' id='qid'>" + (n+1) + "</span>" + "   " + quizes[n]['question']);
+		$("#A").html(quizes[0]['choices']['A']);
+		$("#B").html(quizes[0]['choices']['B']);
+		$("#C").html(quizes[0]['choices']['C']);
+		$("#D").html(quizes[0]['choices']['D']);
+
+
+		$("label.btn").on('click',function () {
+	  		n++;
+
+	  		var choice = $(this).attr("name");
+	  		$(this).checking(choice);
+	  		if (n <= max) {
+	  			if (n == max) {
+				  	setTimeout(function(){
+						$.post( "/quizSubmit", {
+						    returnedAnswers: JSON.stringify(returnedAnswers) 
+						});
+					  	$('.modal-content').html("<div class='jumbotron'><p>You have completed the Quiz!</p> <p>Test results has been recorded </p>  <p>New quizes can be generated next time!</p></div>");
+				  	}, 1500);
+	  			}
+	  			else {
+				  	setTimeout(function(){
+						$('#quiz').show();
+						$('#loadbar').fadeOut();
+						answer = quizes[n]['answer'];
+						document.getElementById("A").style.background='#337ab7';
+						document.getElementById("B").style.background='#337ab7';
+						document.getElementById("C").style.background='#337ab7';
+						document.getElementById("D").style.background='#337ab7';
+						
+						$("#question").html("<span class='label label-warning' id='qid'>" + (n+1) + "</span>" + "   " + quizes[n]['question']);
+						$("#A").html(quizes[n]['choices']['A']);
+						$("#B").html(quizes[n]['choices']['B']);
+						$("#C").html(quizes[n]['choices']['C']);
+						$("#D").html(quizes[n]['choices']['D']);
+				   /* something else */
+				  	}, 2000);
+
+				  	setTimeout(function(){
+				  		$('#loadbar').show();
+			    		$('#quiz').fadeOut();
+				   /* something else */
+				  	}, 1500);	  				
+	  			}
+	  		}
+		});
+
+		$.fn.checking = function(ck) {
+			returnedAnswers[n-1] = [quizes[n-1]['question'], answer == ck ? 1 : 0];
+			console.log(returnedAnswers);
+			if (ck == answer) {
+			  document.getElementById(ck).style.background='green';
+			}
+			else {
+			  document.getElementById(answer).style.background='green';
+			  document.getElementById(ck).style.background='#B40404';
+			}
+		}; 
+	  }); 
+
+	</script>
+
+</head>
+ 
+<body>
+  
+	<div class="container">
+		<div class="header">
+			<nav>
+				<ul class="nav nav-pills pull-right">
+					<li role="presentation"><a href="/userHome">Home</a></li>
+					<li role="presentation"><a href="/wordlist">Word List</a></li>
+					<li role="presentation" class="active"><a href="#">Quiz!</a></li>
+					<li role="presentation"><a href="/logout">Log Out</a></li>
+				</ul>
+			</nav>
+			<h3 class="text-muted">Word Master</h3>
+		</div>
+ 
+		  <div class="modal-content">
+
+			<div class="modal-header">
+				<h3 class="questionTitle" id="question"><span class="label label-warning" id="qid">1</span></h3>
+			</div>
+			<div class="modal-body">
+				<div class="col-xs-3 col-xs-offset-5">
+					<div id="loadbar" style="display: none;">
+					  <div class="blockG" id="rotateG_01"></div>
+					  <div class="blockG" id="rotateG_02"></div>
+					  <div class="blockG" id="rotateG_03"></div>
+					  <div class="blockG" id="rotateG_04"></div>
+					  <div class="blockG" id="rotateG_05"></div>
+					  <div class="blockG" id="rotateG_06"></div>
+					  <div class="blockG" id="rotateG_07"></div>
+					  <div class="blockG" id="rotateG_08"></div>
+					</div>
+				</div>
+
+				<div class="quiz" id="quiz" data-toggle="buttons">
+				  <label class="element-animation1 btn btn-lg btn-primary btn-block" id="A" name='A'></label>
+				  <label class="element-animation2 btn btn-lg btn-primary btn-block" id="B" name='B'></label>
+				  <label class="element-animation3 btn btn-lg btn-primary btn-block" id="C" name='C'></label>
+				  <label class="element-animation4 btn btn-lg btn-primary btn-block" id="D" name='D'></label>
+				</div>
+			</div>
+			  
+		  </div>
+ 
+		
+ 
+		<footer class="footer">
+            <p>&copy; Team0x2d 2016</p>
+        </footer>
+ 
+	</div>
+
+
+</body>
+ 
+</html>

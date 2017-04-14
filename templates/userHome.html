@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+	<title>Word Master</title>
+ 
+	<link href="../static/bootstrap.min.css" rel="stylesheet">
+	<link href="../static/jumbotron-narrow.css" rel="stylesheet">
+	<script src="../static/jquery-1.12.3.js"></script>
+
+	<script>
+		$(function(){
+			$("#searchResult").hide();
+			$("#processResult").hide();
+			var flag = 1;
+
+			$("#searchButton").on('click',function () {
+				$("#searchResult").show();
+				$.ajax({
+		            type: "GET",
+		            url: "/searchWord",
+		            contentType: "application/json; charset=utf-8",
+		            data: { wordToSearch: $("#word").val() },
+		            success: function(data) {
+		            	$("#meaning").html(data);
+		            }
+		        });
+			});
+
+			$("#addButton").on('click',function () {
+				$.ajax({
+		            type: "GET",
+		            url: "/addWord",
+		            contentType: "application/json; charset=utf-8",
+		            data: { wordToAdd: $("#word").val() },
+		            success: function(data) {
+		            }
+		        });
+			});
+
+			$("#processButton").on('click',function () {
+	            console.log($('#paragraphContent').val())
+
+				if (flag == 1) {
+					 $("#paragraphContent").hide(); 
+					$("#processResult").show();
+					$("#processButton").html("Back");			
+					flag = 0;
+				}
+				else {
+					$("#paragraphContent").show(); 
+					$("#processResult").hide();
+					$("#processButton").html("Process");			
+					flag = 1;
+				}
+
+
+
+				$.ajax({
+                type: "GET",
+                url: "/getWordTag",
+                contentType: "json",
+                data: { wordToSearch: $('#paragraphContent').val() },
+                success: function(res) {
+                    // console.log("here2")
+                                       
+                    
+                    var wordObj = JSON.parse(res);
+                    // console.log(wordObj;
+
+                    $('#processResult').empty()
+
+                    // var input="China USA"
+                    var input=$('#paragraphContent').val()
+                    var array=input.split(" ") 
+                    var word = '';
+                    var div = $('<span>')
+                    // console.log(input.length - 1)
+                    for (var i =0 ; i <= array.length - 1; i++) {
+                        // console.log(array[i])
+
+                        $.each(wordObj, function(index, value) {
+            
+                            if (value.word===array[i]) {
+                                console.log("word meaning is: ");
+                                console.log(value.meaning)
+                                
+                                word = $(div).clone();
+                                $(word).text(value.word+" ");
+                                $('#processResult').append(word);
+                          
+                                switch(value.meaning) {
+                                    case "AsianCountry":
+                                        word.css("color", "red");
+                                        break;
+                                    // case "AmericanCountry":
+                                    //     word.css("color", "green");
+                                    //     break;
+                                    // case "EuroCountry":
+                                    //     word.css("color", "blue");
+                                    //     break;
+                                    default:
+                                        word.css("color", "blue");
+                                }
+                                
+                            };
+                            
+                        });
+
+                    };                    
+                }
+
+            });
+
+
+
+
+
+
+			});
+	  	}); 
+
+	</script>
+ 
+</head>
+ 
+<body>
+ 
+	<div class="container">
+		<div class="header">
+			<nav>
+				<ul class="nav nav-pills pull-right">
+					<li role="presentation" class="active"><a href="/userHome">Home</a></li>
+					<li role="presentation"><a href="/wordlist">Word List</a></li>
+					<li role="presentation"><a href="/showQuiz">Quiz!</a></li>
+					<li role="presentation"><a href="/logout">Log Out</a></li>
+				</ul>
+			</nav>
+			<h3 class="text-muted">Word Master</h3>
+		</div> 
+
+		<div class="form-group">
+		  <label>Paragraph</label>
+		  	<textarea class="form-control" rows="10" id="paragraphContent"></textarea>
+
+			<div class="jumbotron" id="processResult">
+	    	</div>
+
+		  	<button type="button" class="btn btn-primary" style=" margin: 0 auto; margin-top: 15px; display: block" id="processButton">Process</button>
+		</div>
+
+		  <label>Look up a word</label>
+
+	    <div style="overflow: hidden; margin-bottom: 20px">
+	        <div class="col-md-2"></div>
+	        <div class="col-md-7">
+	            <input id="word" name="word" type="text" placeholder="word" class="form-control input-md">
+	        </div>
+
+	        <div class="col-md-3">
+	        	<button type="button" class="btn btn-primary" id="searchButton">Search</button>
+	        </div>
+	    </div>
+
+        <div class="jumbotron" id="searchResult">
+        	<p id="meaning"></p>
+            <div class="col-md">
+        		<button type="button" class="btn btn-primary" id="addButton">Add</button>
+            </div>
+    	</div>
+
+        <footer class="footer">
+            <p>&copy; Team0x2d 2016</p>
+        </footer>
+ 
+	</div>
+</body>
+ 
+</html>
